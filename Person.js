@@ -15,31 +15,57 @@ class Person extends GameObject {
     }
 
     update(state) {
-        this.updatePosition();
-        this.updateSprite(state);
-        if (this.isPlayerControlled && this.movingProgressRemaining === 0 && state.arrow) {
-            this.direction = state.arrow;
+        if (this.movingProgressRemaining > 0) {
+            this.updatePosition();
+        } else {
+            // case: keboard ready and arrow pressed
+            if (this.isPlayerControlled && state.arrow) {
+                this.startBehavior(state, {
+                    type: "walk",
+                    direction: state.arrow
+                })
+            }
+            this.updateSprite(); // 여기 state는 삭제해도 되는거지?
+        }
+    }
+
+    startBehavior(state, behaivor) {
+        // set charater direction to whatever behaivor has 
+        this.direction = behaivor.direction;
+
+        if (behaivor.type === "walk") {
+            // console.log(state.map.isSpaceTaken(this.x, this.y, this.direction));
+
+            // stop here if space is not free
+            if (state.map.isSpaceTaken(this.x, this.y, this.direction)) {
+                return;
+            }
+
+            // ready to walk
+            state.map.moveWall(this.x, this.y, this.direction); // 이게 있어야 spawn 지점의 wall이 사라짐
             this.movingProgressRemaining = 16;
         }
     }
 
     updatePosition(){
-        if (this.movingProgressRemaining > 0) {
-            const [property, change] = this.directionUpdate[this.direction]; // 아 이런 식으로 쓸 수 있구나!
-            this[property] += change;
-            console.log(this[property]);
-            this.movingProgressRemaining -= 1;
-        }
+        const [property, change] = this.directionUpdate[this.direction]; // 아 이런 식으로 쓸 수 있구나!
+        this[property] += change;
+        // console.log(this[property]);
+        this.movingProgressRemaining -= 1;
     }
 
-    updateSprite(state) {
-        if (this.isPlayerControlled && this.movingProgressRemaining === 0 && !state.arrow) {
-            this.sprite.setAnimation("idle-"+this.direction);
-            return;
-        }
-        
+    updateSprite() {
         if (this.movingProgressRemaining > 0) {
             this.sprite.setAnimation("walk-"+this.direction);
+            return;
         }
+
+        this.sprite.setAnimation("idle-"+this.direction);
+
+        // if (this.isPlayerControlled && this.movingProgressRemaining === 0 && !state.arrow) {
+        //     this.sprite.setAnimation("idle-"+this.direction);
+        //     return;
+        // }
+
     }
 }

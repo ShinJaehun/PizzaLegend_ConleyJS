@@ -68,8 +68,10 @@ class Sprite {
     }
 
     draw(ctx, cameraPerson) {
+        // 타일 중앙에 있게 하기 위해서 x - 8, y - 18
         const x = this.gameObject.x - 8 + utils.withGrid(10.5) - cameraPerson.x;
         const y = this.gameObject.y - 18 + utils.withGrid(6) - cameraPerson.y;
+
         this.isShadowLoaded && ctx.drawImage(
             this.shadow,
             x,
