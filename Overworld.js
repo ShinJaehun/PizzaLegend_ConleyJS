@@ -26,7 +26,9 @@ class Overworld {
             this.map.drawLowerImage(this.ctx, cameraPserson);
 
             // draw game objects
-            Object.values(this.map.gameObjects).forEach(object => {
+            Object.values(this.map.gameObjects).sort((a,b) => {
+                return a.y - b.y; // 이렇게 해서 object 아래에 hero의 머리가 밟히는 것을 수정할 수 있음!
+            }).forEach(object => {
                 object.sprite.draw(this.ctx, cameraPserson);
             });
 
@@ -47,5 +49,13 @@ class Overworld {
         this.directionInput = new DirectionInput();
         this.directionInput.init();
         this.startGameLoop();
+
+        this.map.startCutscene([
+            { who: "hero", type: "walk", direction: "down" },
+            { who: "hero", type: "walk", direction: "down" },
+            { who: "npcA", type: "walk", direction: "left" },
+            { who: "npcA", type: "walk", direction: "left" },
+            { who: "npcA", type: "stand", direction: "up", time: 800 },
+        ])
     }
 }
